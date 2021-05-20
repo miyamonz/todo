@@ -1,56 +1,29 @@
-/**
- * @see https://wicg.github.io/file-system-access
- */
+import { openFile, saveFile } from "./funcs";
+import { atom } from "jotai";
+import { getStorage } from "../indexedDB";
 
-async function _writeFile(
-  fileHandle: FileSystemFileHandle,
-  contents: string | BufferSource | Blob
-) {
-  const writable = await fileHandle.createWritable();
-  await writable.write(contents);
-  await writable.close();
-}
+export { openFile, saveFile };
 
-// 名前を付けて保存
-export async function saveAs(contents: string): Promise<FileSystemHandle> {
-  const handle = await window.showSaveFilePicker({
-    types: [
-      {
-        description: "todo json",
-        accept: {
-          "application/json": [".json"],
-        },
-      },
-    ],
+async function getHandleAtom() {
+  const storage = await getStorage();
+  const key = "fileHandle";
+  const handle = await storage.get(key);
+  const handleAtom = atom<
+    FileSystemFileHandle | undefined,
+    FileSystemFileHandle
+  >(handle, (_get, set, handle) => {
+    storage.set(key, handle);
+    set(handleAtom, handle);
   });
-
-  return saveFile(contents, handle);
+  return handleAtom;
 }
+export const handleAtom = await getHandleAtom();
 
-export async function saveFile(
-  contents: string,
-  handle: FileSystemFileHandle
-): Promise<FileSystemHandle> {
-  await _writeFile(handle, contents);
-  return handle;
-}
-
-export async function openFile(): Promise<FileSystemFileHandle> {
-  const [fileHandle] = await window.showOpenFilePicker({
-    types: [
-      {
-        description: "json",
-        accept: {
-          "application/json": [".json"],
-        },
-      },
-    ],
-    multiple: false,
-  });
-
-  return fileHandle;
-}
-
-export function isNativeFileSystemSupported() {
-  return "showOpenFilePicker" in window;
-}
+export const writeToHandleFileAtom = atom(
+  null,
+  (get, _set, content: string) => {
+    const handle = get(handleAtom);
+    if (handle) saveFile(content, handle);
+    else console.error("there is no handle");
+  }
+);
