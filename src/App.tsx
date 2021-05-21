@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { atom, useAtom } from "jotai";
+import { useAtom } from "jotai";
 import { splitAtom } from "jotai/utils";
 import { focusAtom } from "jotai/optics";
 import "./App.css";
@@ -8,31 +8,29 @@ import { jsonAtom } from "./indexedDB";
 import { openFile, handleAtom, writeToHandleFileAtom } from "./NFS";
 import { newTask, TaskItem } from "./Task";
 
-const textAtom = atom((get) => JSON.stringify(get(jsonAtom)));
-const isJsonAtom = atom((get) => {
-  try {
-    JSON.parse(get(textAtom));
-    return true;
-  } catch (e) {
-    return false;
-  }
-});
-
 const tasksAtom = focusAtom(jsonAtom, (optic) => optic.prop("tasks"));
 const taskAtomsAtom = splitAtom(tasksAtom);
 
-function App() {
-  const [, setFileHandle] = useAtom(handleAtom);
-  const [, writeTo] = useAtom(writeToHandleFileAtom);
-  const [json] = useAtom(jsonAtom);
-  const [tasks, setTasks] = useAtom(tasksAtom);
-  const [taskAtoms, removeTask] = useAtom(taskAtomsAtom);
+function useAddTask() {
+  const [, setTasks] = useAtom(tasksAtom);
   const addTask = () => {
     setTasks((prev) => [...prev, newTask()]);
   };
+
+  return addTask;
+}
+
+function App() {
+  const [, setFileHandle] = useAtom(handleAtom);
+
+  const [, writeTo] = useAtom(writeToHandleFileAtom);
+  const [json] = useAtom(jsonAtom);
   useEffect(() => {
     writeTo(JSON.stringify(json, null, 2));
   }, [json]);
+
+  const [taskAtoms, removeTask] = useAtom(taskAtomsAtom);
+  const addTask = useAddTask();
   return (
     <div className="App">
       <header className="App-header">
@@ -46,7 +44,7 @@ function App() {
               <li key={`${taskAtom}`}>
                 <TaskItem
                   taskAtom={taskAtom}
-                  remove={(task) => removeTask(task)}
+                  remove={() => removeTask(taskAtom)}
                 />
               </li>
             );
