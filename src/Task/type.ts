@@ -4,7 +4,7 @@ export interface Task {
   updated: number; //unixtime
 }
 export function newTask(): Task {
-  const now = +new Date() / 1000;
+  const now = Math.floor(+new Date() / 1000);
   return {
     text: "",
     created: now,

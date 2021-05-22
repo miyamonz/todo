@@ -5,8 +5,8 @@ import { focusAtom } from "jotai/optics";
 import "./App.css";
 
 import { jsonAtom } from "./indexedDB";
-import { openFile, handleAtom, writeToHandleFileAtom } from "./NFS";
 import { newTask, TaskItem } from "./Task";
+import { setGist } from "./gist";
 
 const tasksAtom = focusAtom(jsonAtom, (optic) => optic.prop("tasks"));
 const taskAtomsAtom = splitAtom(tasksAtom);
@@ -21,12 +21,9 @@ function useAddTask() {
 }
 
 function App() {
-  const [, setFileHandle] = useAtom(handleAtom);
-
-  const [, writeTo] = useAtom(writeToHandleFileAtom);
   const [json] = useAtom(jsonAtom);
   useEffect(() => {
-    writeTo(JSON.stringify(json, null, 2));
+    setGist(json);
   }, [json]);
 
   const [taskAtoms, removeTask] = useAtom(taskAtomsAtom);
@@ -35,9 +32,6 @@ function App() {
     <div className="App">
       <header className="App-header">
         <p>todo</p>
-        <p>
-          <button onClick={() => openFile().then(setFileHandle)}>open</button>
-        </p>
         <ul>
           {taskAtoms.map((taskAtom) => {
             return (

@@ -1,6 +1,5 @@
 import { kvsIndexedDB } from "@kvs/indexeddb";
 import { atom } from "jotai";
-import { saveFile } from "../NFS";
 import type { WritableAtom } from "jotai";
 
 import type { State } from "../store";
@@ -8,6 +7,8 @@ import type { State } from "../store";
 type StorageSchema = {
   json: State;
   fileHandle?: FileSystemFileHandle;
+  gistId: string;
+  gistToken: string;
 };
 
 export async function getStorage() {
@@ -16,6 +17,9 @@ export async function getStorage() {
     version: 1,
   });
 }
+
+//@ts-ignore
+window.storage = await getStorage();
 
 export async function getIndexedDBAtom(): Promise<WritableAtom<State, State>> {
   const storage = await getStorage();
