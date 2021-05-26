@@ -1,4 +1,6 @@
 import { kvsIndexedDB } from "@kvs/indexeddb";
+
+import { getGist } from "../gist";
 import { atom } from "jotai";
 import type { WritableAtom } from "jotai";
 
@@ -24,7 +26,9 @@ window.storage = await getStorage();
 export async function getIndexedDBAtom(): Promise<WritableAtom<State, State>> {
   const storage = await getStorage();
   const key = "json";
-  const json = (await storage.get(key)) ?? { tasks: [] };
+  const fromGist = await getGist();
+  const json = JSON.parse(fromGist);
+  console.log(json);
   if (json) {
     const anAtom = atom<State, State>(json, (_get, set, json) => {
       storage.set(key, json);

@@ -8,6 +8,10 @@ import { jsonAtom } from "./indexedDB";
 import { newTask, TaskItem } from "./Task";
 import { setGist } from "./gist";
 
+import debounce from "just-debounce-it";
+
+const _setGist = debounce((arg: any) => setGist(arg), 1000);
+
 const tasksAtom = focusAtom(jsonAtom, (optic) => optic.prop("tasks"));
 const taskAtomsAtom = splitAtom(tasksAtom);
 
@@ -23,7 +27,7 @@ function useAddTask() {
 function App() {
   const [json] = useAtom(jsonAtom);
   useEffect(() => {
-    setGist(json);
+    _setGist(json);
   }, [json]);
 
   const [taskAtoms, removeTask] = useAtom(taskAtomsAtom);
