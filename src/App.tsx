@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useAtom } from "jotai";
+import { atom, useAtom } from "jotai";
 import { splitAtom } from "jotai/utils";
 import { focusAtom } from "jotai/optics";
 import "./App.css";
@@ -10,9 +10,23 @@ import { setGist } from "./gist";
 
 import debounce from "just-debounce-it";
 
+import { fromUnixTime, set } from "date-fns";
+
 const _setGist = debounce((arg: any) => setGist(arg), 1000);
 
 const tasksAtom = focusAtom(jsonAtom, (optic) => optic.prop("tasks"));
+const datesAtom = atom((get) => {
+  const tasks = get(tasksAtom);
+  const dates = tasks.map((task) => fromUnixTime(task.updated));
+
+  const datesWithoutTime = dates.map((d) =>
+    set(d, { hours: 0, minutes: 0, seconds: 0, milliseconds: 0 })
+  );
+  return datesWithoutTime.filter(
+    (date, i, self) =>
+      self.findIndex((d) => d.getTime() === date.getTime()) === i
+  );
+});
 const taskAtomsAtom = splitAtom(tasksAtom);
 
 function useAddTask() {
@@ -32,6 +46,8 @@ function App() {
 
   const [taskAtoms, removeTask] = useAtom(taskAtomsAtom);
   const addTask = useAddTask();
+
+  const [dates] = useAtom(datesAtom);
   return (
     <div className="App">
       <header className="App-header">
