@@ -16,21 +16,23 @@ export const getGist = async () => {
   return json.files[name].content;
 };
 
-export const setGist = async (body: {}) =>
-  await (
-    await fetch("https://api.github.com/gists/" + id, {
-      method: "PATCH",
-      headers: {
-        Accept: "application/vnd.github.v3+json",
-        Authorization: "token " + token,
-      },
-      body: JSON.stringify({
-        description: "Updated at " + new Date().toLocaleString(),
-        files: {
-          [name]: {
-            content: JSON.stringify(body),
-          },
+export const setGist = async (body: {}) => {
+  const res = await fetch("https://api.github.com/gists/" + id, {
+    method: "PATCH",
+    headers: {
+      Accept: "application/vnd.github.v3+json",
+      Authorization: "token " + token,
+    },
+    body: JSON.stringify({
+      description: "Updated at " + new Date().toLocaleString(),
+      files: {
+        [name]: {
+          content: JSON.stringify(body),
         },
-      }),
-    })
-  ).json();
+      },
+    }),
+  });
+  const json = await res.json();
+  const { content } = json.files[name];
+  return JSON.parse(content);
+};
