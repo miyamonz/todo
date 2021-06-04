@@ -14,13 +14,14 @@ const TaskItem: React.FC<{ taskAtom: TaskAtom; remove(task: TaskAtom): void }> =
       <HStack>
         <Textarea
           value={task.text}
-          w={500}
+          w={800}
+          rows={task.text.split("\n").length}
           background={task.done ? "gray" : "white"}
           onChange={(e) =>
             setTask((prev) => ({ ...prev, text: e.target.value }))
           }
         />
-        <Button onClick={() => setDone(true)}>done</Button>
+        <Button onClick={() => setDone(!task.done)}>done</Button>
         <Button onClick={() => remove(taskAtom)}>x</Button>
       </HStack>
     );
