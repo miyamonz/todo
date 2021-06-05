@@ -16,7 +16,9 @@ const TaskItem: React.FC<{ taskAtom: TaskAtom; remove(task: TaskAtom): void }> =
           value={task.text}
           w={800}
           rows={task.text.split("\n").length}
-          background={task.done ? "gray" : "white"}
+          bg={task.done ? "gray.300" : "white.300"}
+          color={task.done ? "gray.600" : "black.300"}
+          fontSize={task.done ? "sm" : "xl"}
           onChange={(e) =>
             setTask((prev) => ({ ...prev, text: e.target.value }))
           }

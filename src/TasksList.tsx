@@ -2,6 +2,7 @@ import React from "react";
 import { useAtom } from "jotai";
 import type { WritableAtom } from "jotai";
 import { splitAtom } from "jotai/utils";
+import { filterAtom } from "./jotaiUtils/filterAtom";
 import { Stack, Button } from "@chakra-ui/react";
 
 import { newTask, TaskItem } from "./Task";
@@ -10,26 +11,26 @@ import type { Task } from "./Task";
 type SetStateAction<Value> = Value | ((prev: Value) => Value);
 type TasksAtom = WritableAtom<Task[], SetStateAction<Task[]>>;
 
-function useAddTask(tasksAtom: TasksAtom) {
-  const [, setTasks] = useAtom(tasksAtom);
-  const addTask = () => {
-    setTasks((prev) => [...prev, newTask()]);
-  };
-
-  return addTask;
-}
-
 type Prop = {
   tasksAtom: TasksAtom;
+  filter?: (task: Task) => boolean;
+  addTask: (task: Task) => void;
 };
-const TasksList: React.FC<Prop> = ({ tasksAtom }) => {
+const TasksList: React.FC<Prop> = ({
+  tasksAtom,
+  filter = () => true,
+  addTask,
+}) => {
   const taskAtomsAtom = splitAtom(tasksAtom);
+
   const [taskAtoms, removeTask] = useAtom(taskAtomsAtom);
-  const addTask = useAddTask(tasksAtom);
+  const [filteredAtoms] = useAtom(
+    filterAtom(taskAtoms, React.useCallback(filter, []))
+  );
 
   return (
     <Stack>
-      {taskAtoms.map((taskAtom) => {
+      {filteredAtoms.map((taskAtom) => {
         return (
           <TaskItem
             key={`${taskAtom}`}
@@ -38,7 +39,7 @@ const TasksList: React.FC<Prop> = ({ tasksAtom }) => {
           />
         );
       })}
-      <Button onClick={() => addTask()}>add</Button>
+      <Button onClick={() => addTask(newTask())}>add</Button>
     </Stack>
   );
 };
