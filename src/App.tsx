@@ -13,7 +13,7 @@ import { setGist } from "./gist";
 
 import debounce from "just-debounce-it";
 
-import { fromUnixTime, set } from "date-fns";
+import { fromUnixTime, startOfDay } from "date-fns";
 import { isToday } from "date-fns";
 
 const _setGist = debounce((arg: any) => setGist(arg), 100);
@@ -33,9 +33,7 @@ const datesAtom = atom((get) => {
   const tasks = get(tasksAtom);
   const dates = tasks.map((task) => fromUnixTime(task.updated));
 
-  const datesWithoutTime = dates.map((d) =>
-    set(d, { hours: 0, minutes: 0, seconds: 0, milliseconds: 0 })
-  );
+  const datesWithoutTime = dates.map((d) => startOfDay(d));
   return datesWithoutTime.filter(
     (date, i, self) =>
       self.findIndex((d) => d.getTime() === date.getTime()) === i
