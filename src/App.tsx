@@ -5,7 +5,7 @@ import { focusAtom } from "jotai/optics";
 import { Container, Heading } from "@chakra-ui/react";
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from "@chakra-ui/react";
 
-import TasksList from "./TasksList";
+import TaskList from "./TaskList";
 import type { Task } from "./Task";
 
 import { jsonAtom } from "./indexedDB";
@@ -61,28 +61,28 @@ function App() {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <TasksList
+            <TaskList
               tasksAtom={tasksAtom}
               filter={(t) => isToday(fromUnixTime(t.created))}
               addTask={addTask}
             />
           </TabPanel>
           <TabPanel>
-            <TasksList
+            <TaskList
               tasksAtom={tasksAtom}
               filter={(t) => !t.done}
               addTask={addTask}
             />
           </TabPanel>
           <TabPanel>
-            <TasksList
+            <TaskList
               tasksAtom={tasksAtom}
               filter={(t) => t.done}
               addTask={(t) => addTask({ ...t, done: true })}
             />
           </TabPanel>
           <TabPanel>
-            <TasksList tasksAtom={tasksAtom} addTask={addTask} />
+            <TaskList tasksAtom={tasksAtom} addTask={addTask} />
           </TabPanel>
         </TabPanels>
       </Tabs>

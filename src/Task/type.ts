@@ -3,6 +3,7 @@ export interface Task {
   created: number; //unixtime
   updated: number; //unixtime
   done: boolean;
+  project?: string;
 }
 export function newTask(): Task {
   const now = Math.floor(+new Date() / 1000);

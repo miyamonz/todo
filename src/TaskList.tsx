@@ -16,7 +16,7 @@ type Prop = {
   filter?: (task: Task) => boolean;
   addTask: (task: Task) => void;
 };
-const TasksList: React.FC<Prop> = ({
+const TaskList: React.FC<Prop> = ({
   tasksAtom,
   filter = () => true,
   addTask,
@@ -44,4 +44,4 @@ const TasksList: React.FC<Prop> = ({
   );
 };
 
-export default TasksList;
+export default TaskList;
