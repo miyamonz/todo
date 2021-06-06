@@ -1,4 +1,4 @@
-import { getStorage } from "../indexedDB";
+import { getStorage } from "../indexedDB/getStorage";
 const name = "todo.json";
 const storage = await getStorage();
 const id = await storage.get("gistId");

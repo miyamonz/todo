@@ -1,57 +1,29 @@
-import React, { useEffect } from "react";
-import { atom, useAtom } from "jotai";
-import { focusAtom } from "jotai/optics";
+import React from "react";
+import { useAtom } from "jotai";
 
-import { Container, Heading } from "@chakra-ui/react";
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from "@chakra-ui/react";
+import { Layout } from "./Layout";
 
 import TaskList from "./TaskList";
 import type { Task } from "./Task";
 
-import { jsonAtom } from "./indexedDB";
-import { setGist } from "./gist";
+import { tasksAtom } from "./store";
 
-import debounce from "just-debounce-it";
-
-import { fromUnixTime, startOfDay } from "date-fns";
-import { isToday } from "date-fns";
-
-const _setGist = debounce((arg: any) => setGist(arg), 100);
-
-const tasksAtom = focusAtom(jsonAtom, (optic) => optic.prop("tasks"));
+import { fromUnixTime, isToday } from "date-fns";
 
 function useAddTask() {
   const [, setTasks] = useAtom(tasksAtom);
   const addTask = (task: Task) => {
     setTasks((prev) => [...prev, task]);
   };
-
   return addTask;
 }
 
-const datesAtom = atom((get) => {
-  const tasks = get(tasksAtom);
-  const dates = tasks.map((task) => fromUnixTime(task.updated));
-
-  const datesWithoutTime = dates.map((d) => startOfDay(d));
-  return datesWithoutTime.filter(
-    (date, i, self) =>
-      self.findIndex((d) => d.getTime() === date.getTime()) === i
-  );
-});
-
 function App() {
-  const [json] = useAtom(jsonAtom);
-  useEffect(() => {
-    _setGist(json);
-  }, [json]);
-
   const addTask = useAddTask();
 
-  const [dates] = useAtom(datesAtom);
   return (
-    <Container maxW={"5xl"}>
-      <Heading>todo</Heading>
+    <Layout>
       <Tabs>
         <TabList position="sticky" top={0} zIndex="sticky" background="white">
           <Tab>today</Tab>
@@ -86,7 +58,7 @@ function App() {
           </TabPanel>
         </TabPanels>
       </Tabs>
-    </Container>
+    </Layout>
   );
 }
 
