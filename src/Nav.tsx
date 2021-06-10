@@ -12,6 +12,7 @@ import {
 import React, { FC } from "react";
 import { HiHome, HiOutlineHome } from "react-icons/hi";
 import { FaKiwiBird } from "react-icons/fa";
+import ProjectList from "./Project/ProjectList";
 
 const NaviLink: FC<
   {
@@ -83,6 +84,7 @@ export const Navi: FC<{}> = () => {
       >
         ホーム
       </NaviLink>
+      <ProjectList />
       <Spacer />
     </Stack>
   );

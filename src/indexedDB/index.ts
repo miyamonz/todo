@@ -15,6 +15,7 @@ export async function getIndexedDBAtom(): Promise<WritableAtom<State, State>> {
   const key = "json";
   const fromGist = await getGist();
   const json = JSON.parse(fromGist);
+  if (json?.projects === undefined) json.projects = [];
   console.log(json);
   if (json) {
     const anAtom = atom<State, State>(json, (_get, set, json) => {

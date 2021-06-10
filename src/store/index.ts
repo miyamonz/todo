@@ -9,6 +9,9 @@ export { jsonAtom };
 import { fromUnixTime, startOfDay } from "date-fns";
 
 export const tasksAtom = focusAtom(jsonAtom, (optic) => optic.prop("tasks"));
+export const projectsAtom = focusAtom(jsonAtom, (optic) =>
+  optic.prop("projects")
+);
 
 export const datesAtom = atom((get) => {
   const tasks = get(tasksAtom);
