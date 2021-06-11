@@ -3,7 +3,7 @@ import { useAtom } from "jotai";
 
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from "@chakra-ui/react";
 
-import TaskList from "./TaskList";
+import TaskList from "./Task/TaskList";
 import type { Task } from "./Task";
 
 import { tasksAtom } from "./store";

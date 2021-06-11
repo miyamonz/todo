@@ -2,11 +2,11 @@ import React from "react";
 import { useAtom } from "jotai";
 import type { WritableAtom } from "jotai";
 import { splitAtom } from "jotai/utils";
-import { filterAtom } from "./jotaiUtils/filterAtom";
+import { filterAtom } from "../jotaiUtils/filterAtom";
 import { Stack, Button } from "@chakra-ui/react";
 
-import { newTask, TaskItem } from "./Task";
-import type { Task } from "./Task";
+import { newTask, TaskItem } from "./";
+import type { Task } from "./type";
 
 type SetStateAction<Value> = Value | ((prev: Value) => Value);
 type TasksAtom = WritableAtom<Task[], SetStateAction<Task[]>>;
