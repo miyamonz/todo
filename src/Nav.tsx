@@ -13,6 +13,7 @@ import React, { FC } from "react";
 import { HiHome, HiOutlineHome } from "react-icons/hi";
 import { FaKiwiBird } from "react-icons/fa";
 import ProjectList from "./Project/ProjectList";
+import { usePath } from "./route";
 
 const NaviLink: FC<
   {
@@ -58,6 +59,7 @@ const NaviLink: FC<
 };
 
 export const Navi: FC<{}> = () => {
+  const [, setPath] = usePath();
   return (
     <Stack
       w={{ base: 20, xl: 200 }}
@@ -81,6 +83,7 @@ export const Navi: FC<{}> = () => {
         isActive={true}
         activeIcon={HiHome}
         inactiveIcon={HiOutlineHome}
+        onClick={() => setPath("/")}
       >
         ホーム
       </NaviLink>
