@@ -1,5 +1,5 @@
 import React from "react";
-import { useAtom } from "jotai";
+import { useUpdateAtom } from "jotai/utils";
 
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from "@chakra-ui/react";
 
@@ -11,18 +11,23 @@ import { tasksAtom } from "./store";
 import { fromUnixTime, isToday } from "date-fns";
 
 function useAddTask() {
-  const [, setTasks] = useAtom(tasksAtom);
-  const addTask = (task: Task) => {
+  const setTasks = useUpdateAtom(tasksAtom);
+  const addTask = React.useCallback((task: Task) => {
     setTasks((prev) => [...prev, task]);
-  };
+  }, []);
   return addTask;
 }
 
 function Home() {
   const addTask = useAddTask();
 
+  const filterToday = React.useCallback(
+    (t) => isToday(fromUnixTime(t.created)),
+    []
+  );
+
   return (
-    <Tabs>
+    <Tabs isLazy>
       <TabList position="sticky" top={0} zIndex="sticky" background="white">
         <Tab>today</Tab>
         <Tab>not done</Tab>
@@ -33,22 +38,25 @@ function Home() {
         <TabPanel>
           <TaskList
             tasksAtom={tasksAtom}
-            filter={(t) => isToday(fromUnixTime(t.created))}
+            filter={filterToday}
             addTask={addTask}
           />
         </TabPanel>
         <TabPanel>
           <TaskList
             tasksAtom={tasksAtom}
-            filter={(t) => !t.done}
+            filter={React.useCallback((t: Task) => !t.done, [])}
             addTask={addTask}
           />
         </TabPanel>
         <TabPanel>
           <TaskList
             tasksAtom={tasksAtom}
-            filter={(t) => t.done}
-            addTask={(t) => addTask({ ...t, done: true })}
+            filter={React.useCallback((t) => t.done, [])}
+            addTask={React.useCallback(
+              (t) => addTask({ ...t, done: true }),
+              []
+            )}
           />
         </TabPanel>
         <TabPanel>
@@ -59,4 +67,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default React.memo(Home);
