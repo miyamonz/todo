@@ -1,7 +1,14 @@
 import React from "react";
 import { atom, useAtom } from "jotai";
 
-const pathAtom = atom("/");
+const strAtom = atom("/");
+const pathAtom = atom(
+  (get) => get(strAtom),
+  (_get, set, to: string) => {
+    history.pushState(null, "", to);
+    set(strAtom, to);
+  }
+);
 
 export function usePath() {
   return useAtom(pathAtom);
@@ -10,7 +17,7 @@ export function usePath() {
 export const Route: React.FC<{ path: string }> = ({ path, children }) => {
   const [curr] = useAtom(pathAtom);
 
-  if (curr === path) return children;
+  if (curr === path) return <>{children}</>;
   return null;
 };
 

@@ -11,7 +11,7 @@ import {
 
 import React, { FC } from "react";
 import { HiHome, HiOutlineHome } from "react-icons/hi";
-import ProjectList from "./Project/ProjectList";
+import ProjectNav from "./Project/ProjectNav";
 import { usePath } from "./route";
 
 const NaviLink: FC<
@@ -61,7 +61,7 @@ export const Navi: FC<{}> = () => {
   const [, setPath] = usePath();
   return (
     <Stack
-      w={{ base: 20, xl: 200 }}
+      w={{ base: 200, xl: 200 }}
       h="100vh"
       pb={4}
       alignItems={{ base: "center", xl: "start" }}
@@ -76,7 +76,7 @@ export const Navi: FC<{}> = () => {
       >
         ホーム
       </NaviLink>
-      <ProjectList />
+      <ProjectNav />
       <Spacer />
     </Stack>
   );

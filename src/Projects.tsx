@@ -6,7 +6,8 @@ import { splitAtom } from "jotai/utils";
 import { useFilterAtom } from "./jotaiUtils/filterAtom";
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from "@chakra-ui/react";
 
-//import TaskList from "./Task/TaskList";
+import ProjectList from "./Project/ProjectList";
+import { newProject } from "./Project/type";
 
 import { projectsAtom } from "./store";
 
@@ -29,17 +30,28 @@ function Projects() {
   );
 }
 
+function useAddProject() {
+  const set = useUpdateAtom(projectsAtom);
+  const add = React.useCallback(() => {
+    set((prev) => [...prev, newProject("")]);
+  }, []);
+  return add;
+}
+
 function ProjectListCurr() {
   const filterToday = React.useCallback((t) => true, []);
   const [filteredAtoms, remove] = useFilterAtom(projectsAtom, filterToday);
 
-  return <TaskList atoms={filteredAtoms} remove={remove} add={() => {}} />;
+  const add = useAddProject();
+
+  return <ProjectList atoms={filteredAtoms} remove={remove} add={add} />;
 }
 
 function ProjectListArchived() {
   const [atoms, remove] = useAtom(splitAtom(projectsAtom));
 
-  return <TaskList atoms={atoms} remove={remove} add={() => {}} />;
+  const add = useAddProject();
+  return <ProjectList atoms={atoms} remove={remove} add={add} />;
 }
 
 export default Projects;

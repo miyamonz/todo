@@ -1,36 +1,61 @@
 import React from "react";
 import { useAtom } from "jotai";
-import ProjectItem from "./ProjectItem";
-import ProjectModal from "./ProjectModal";
-import { Project, newProject } from "./type";
+import type { PrimitiveAtom } from "jotai";
+import { useUpdateAtom } from "jotai/utils";
+import { focusAtom } from "jotai/optics";
+import { List } from "../List/List";
+import { Stack, Button } from "@chakra-ui/react";
 
-import { projectsAtom } from "../store";
-import { usePath } from "../route";
-import { splitAtom } from "jotai/utils";
+import type { Column, CellProps } from "react-table";
 
-import { Stack, Heading, Button } from "@chakra-ui/react";
+import { ListTextarea } from "../components/ListTextarea";
+import type { Project } from "./type";
 
-const projectAtomsAtom = splitAtom(projectsAtom);
+const identity = (a: unknown) => a;
 
-function useAddProject() {
-  const [, set] = useAtom(projectsAtom);
-  return (project: Project) => {
-    set((prev) => [...prev, project]);
-  };
-}
-type Prop = {};
-const ProjectList: React.FC<Prop> = ({}) => {
-  const [projectAtoms] = useAtom(projectAtomsAtom);
-  const addProject = useAddProject();
+type Prop = {
+  atoms: PrimitiveAtom<Project>[];
+  remove: (item: PrimitiveAtom<Project>) => void;
+  add: () => void;
+};
 
-  const [, setPath] = usePath();
+const ProjectList: React.FC<Prop> = ({ atoms, remove, add }) => {
+  type Data = PrimitiveAtom<Project>;
+  type Value = PrimitiveAtom<Project>;
+
+  const columns = React.useMemo<Column<Data>[]>(
+    () => [
+      {
+        id: "name",
+        accessor: identity,
+        Cell: ({ value }: CellProps<Data, Value>) => {
+          const [task, set] = useAtom(value);
+          return (
+            <ListTextarea
+              value={task.title}
+              done={false}
+              onChange={(e) =>
+                set((prev) => ({ ...prev, title: e.target.value }))
+              }
+            />
+          );
+        },
+      },
+      {
+        id: "remove",
+        accessor: identity,
+        Cell: ({ value }: CellProps<Data, Value>) => (
+          <Button onClick={() => remove(value)}>x</Button>
+        ),
+      },
+    ],
+    []
+  );
+
   return (
     <Stack>
-      <Heading size="sm">projects</Heading>
-      {projectAtoms.map((projectAtom) => {
-        return <ProjectItem key={`${projectAtom}`} projectAtom={projectAtom} />;
-      })}
-      <Button onClick={() => setPath("/projects")}>edit</Button>
+      <List atoms={atoms} columns={columns} />
+      <Button onClick={() => add()}>add</Button>
     </Stack>
   );
 };
