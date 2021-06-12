@@ -2,6 +2,10 @@ import { atom } from "jotai";
 import type { Atom, WritableAtom, PrimitiveAtom } from "jotai";
 
 import { getWeakCacheItem, setWeakCacheItem } from "./weakCache";
+
+import { useAtom } from "jotai";
+import { splitAtom } from "jotai/utils";
+import { useCallback } from "react";
 type Getter = {
   <Value>(atom: Atom<Value | Promise<Value>>): Value;
   <Value>(atom: Atom<Promise<Value>>): Value;
@@ -48,4 +52,14 @@ export function filterAtom<Item>(
   const filteredAtom = atom(read);
   setWeakCacheItem(filterAtomCache, deps, filteredAtom);
   return filteredAtom;
+}
+
+export function useFilterAtom<T>(
+  atomsAtom: PrimitiveAtom<T[]>,
+  filter: (item: T) => boolean
+) {
+  const [atoms, remove] = useAtom(splitAtom(atomsAtom));
+  const [filteredAtoms] = useAtom(filterAtom(atoms, useCallback(filter, [])));
+
+  return [filteredAtoms, remove] as const;
 }

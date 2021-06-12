@@ -1,10 +1,13 @@
 import React from "react";
+import { useAtom } from "jotai";
 import { useUpdateAtom } from "jotai/utils";
+import { splitAtom } from "jotai/utils";
 
+import { useFilterAtom } from "./jotaiUtils/filterAtom";
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from "@chakra-ui/react";
 
 import TaskList from "./Task/TaskList";
-import type { Task } from "./Task";
+import { newTask } from "./Task";
 
 import { tasksAtom } from "./store";
 
@@ -12,59 +15,47 @@ import { fromUnixTime, isToday } from "date-fns";
 
 function useAddTask() {
   const setTasks = useUpdateAtom(tasksAtom);
-  const addTask = React.useCallback((task: Task) => {
-    setTasks((prev) => [...prev, task]);
+  const addTask = React.useCallback(() => {
+    setTasks((prev) => [...prev, newTask()]);
   }, []);
   return addTask;
 }
 
 function Home() {
-  const addTask = useAddTask();
-
-  const filterToday = React.useCallback(
-    (t) => isToday(fromUnixTime(t.created)),
-    []
-  );
-
   return (
     <Tabs isLazy>
       <TabList position="sticky" top={0} zIndex="sticky" background="white">
         <Tab>today</Tab>
-        <Tab>not done</Tab>
-        <Tab>done</Tab>
         <Tab>all</Tab>
       </TabList>
       <TabPanels>
         <TabPanel>
-          <TaskList
-            tasksAtom={tasksAtom}
-            filter={filterToday}
-            addTask={addTask}
-          />
+          <TaskListToday />
         </TabPanel>
         <TabPanel>
-          <TaskList
-            tasksAtom={tasksAtom}
-            filter={React.useCallback((t: Task) => !t.done, [])}
-            addTask={addTask}
-          />
-        </TabPanel>
-        <TabPanel>
-          <TaskList
-            tasksAtom={tasksAtom}
-            filter={React.useCallback((t) => t.done, [])}
-            addTask={React.useCallback(
-              (t) => addTask({ ...t, done: true }),
-              []
-            )}
-          />
-        </TabPanel>
-        <TabPanel>
-          <TaskList tasksAtom={tasksAtom} addTask={addTask} />
+          <TaskListAll />
         </TabPanel>
       </TabPanels>
     </Tabs>
   );
 }
 
-export default React.memo(Home);
+function TaskListToday() {
+  const filterToday = React.useCallback(
+    (t) => isToday(fromUnixTime(t.created)),
+    []
+  );
+  const [filteredAtoms, remove] = useFilterAtom(tasksAtom, filterToday);
+  const addTask = useAddTask();
+
+  return <TaskList taskAtoms={filteredAtoms} remove={remove} add={addTask} />;
+}
+
+function TaskListAll() {
+  const [atoms, remove] = useAtom(splitAtom(tasksAtom));
+  const addTask = useAddTask();
+
+  return <TaskList taskAtoms={atoms} remove={remove} add={addTask} />;
+}
+
+export default Home;
