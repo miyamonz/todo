@@ -12,7 +12,7 @@ import {
 import React, { FC } from "react";
 import { HiHome, HiOutlineHome } from "react-icons/hi";
 import ProjectNav from "./Project/ProjectNav";
-import { usePath } from "./route";
+import { Link } from "wouter";
 
 const NaviLink: FC<
   {
@@ -58,7 +58,6 @@ const NaviLink: FC<
 };
 
 export const Navi: FC<{}> = () => {
-  const [, setPath] = usePath();
   return (
     <Stack
       w={{ base: 200, xl: 200 }}
@@ -68,14 +67,15 @@ export const Navi: FC<{}> = () => {
       spacing={1}
       px={{ base: 0, xl: 4 }}
     >
-      <NaviLink
-        isActive={true}
-        activeIcon={HiHome}
-        inactiveIcon={HiOutlineHome}
-        onClick={() => setPath("/")}
-      >
-        ホーム
-      </NaviLink>
+      <Link href="/">
+        <NaviLink
+          isActive={true}
+          activeIcon={HiHome}
+          inactiveIcon={HiOutlineHome}
+        >
+          ホーム
+        </NaviLink>
+      </Link>
       <ProjectNav />
       <Spacer />
     </Stack>

@@ -5,7 +5,7 @@ import { Layout } from "./Layout";
 import Home from "./Home";
 import Projects from "./Projects";
 
-import { Route } from "./route";
+import { Route } from "wouter";
 
 function App() {
   return (
