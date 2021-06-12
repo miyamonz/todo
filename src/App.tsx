@@ -3,6 +3,7 @@ import React from "react";
 import { Layout } from "./Layout";
 
 import Home from "./Home";
+import Projects from "./Projects";
 
 import { Route } from "./route";
 
@@ -12,7 +13,9 @@ function App() {
       <Route path="/">
         <Home />
       </Route>
-      <Route path="/projects">projects</Route>
+      <Route path="/projects">
+        <Projects />
+      </Route>
     </Layout>
   );
 }

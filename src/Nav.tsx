@@ -11,7 +11,6 @@ import {
 
 import React, { FC } from "react";
 import { HiHome, HiOutlineHome } from "react-icons/hi";
-import { FaKiwiBird } from "react-icons/fa";
 import ProjectList from "./Project/ProjectList";
 import { usePath } from "./route";
 
@@ -69,16 +68,6 @@ export const Navi: FC<{}> = () => {
       spacing={1}
       px={{ base: 0, xl: 4 }}
     >
-      <IconButton
-        mx={4}
-        my={2}
-        alignSelf={{ base: "center", xl: "start" }}
-        fontSize="3xl"
-        aria-label="kiwi"
-        variant="ghost"
-        color={"blue.400"}
-        icon={<Icon as={FaKiwiBird} />}
-      />
       <NaviLink
         isActive={true}
         activeIcon={HiHome}

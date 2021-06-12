@@ -1,19 +1,22 @@
 import React from "react";
-import { useAtom } from "jotai";
+import { PrimitiveAtom, useAtom } from "jotai";
 import type { WritableAtom } from "jotai";
-import { splitAtom } from "jotai/utils";
+import { useUpdateAtom, splitAtom } from "jotai/utils";
+import { focusAtom } from "jotai/optics";
 import { filterAtom } from "../jotaiUtils/filterAtom";
 import { Stack, Button } from "@chakra-ui/react";
 import { Box, HStack, Table, Tbody, Tr, Td } from "@chakra-ui/react";
 
 import { useTable } from "react-table";
 
-import { newTask, TaskItem } from "./";
-import { TaskName, TaskDone, TaskRemove } from "./TaskItem";
+import { newTask } from "./";
+import { ListTextarea } from "../components/ListTextarea";
 import type { Task } from "./type";
 
 type SetStateAction<Value> = Value | ((prev: Value) => Value);
 type TasksAtom = WritableAtom<Task[], SetStateAction<Task[]>>;
+
+const identity = (a: unknown) => a;
 
 type Prop = {
   tasksAtom: TasksAtom;
@@ -27,7 +30,7 @@ const TaskList: React.FC<Prop> = ({
 }) => {
   const taskAtomsAtom = splitAtom(tasksAtom);
 
-  const [taskAtoms, removeTask] = useAtom(taskAtomsAtom);
+  const [taskAtoms, remove] = useAtom(taskAtomsAtom);
   const [filteredAtoms] = useAtom(
     filterAtom(taskAtoms, React.useCallback(filter, []))
   );
@@ -36,20 +39,35 @@ const TaskList: React.FC<Prop> = ({
     () => [
       {
         id: "name",
-        accessor: (row) => row,
-        Cell: ({ value }) => <TaskName taskAtom={value} />,
+        accessor: identity,
+        Cell: ({ value }) => {
+          const [task, setTask] = useAtom(value as PrimitiveAtom<Task>);
+          return (
+            <ListTextarea
+              value={task.text}
+              done={task.done}
+              onChange={(e) =>
+                setTask((prev) => ({ ...prev, text: e.target.value }))
+              }
+            />
+          );
+        },
       },
       {
         id: "done",
-        accessor: (row) => row,
-        Cell: ({ value }) => <TaskDone taskAtom={value} />,
+        accessor: identity,
+        Cell: ({ value }) => {
+          const doneAtom = focusAtom(value as PrimitiveAtom<Task>, (optic) =>
+            optic.prop("done")
+          );
+          const setDone = useUpdateAtom(doneAtom);
+          return <Button onClick={() => setDone((prev) => !prev)}>done</Button>;
+        },
       },
       {
         id: "remove",
-        accessor: (row) => row,
-        Cell: ({ value }) => (
-          <TaskRemove taskAtom={value} remove={() => removeTask(value)} />
-        ),
+        accessor: identity,
+        Cell: ({ value }) => <Button onClick={() => remove(value)}>x</Button>,
       },
     ],
     []
