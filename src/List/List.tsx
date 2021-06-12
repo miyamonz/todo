@@ -6,6 +6,8 @@ import { DragHandleIcon } from "@chakra-ui/icons";
 import { useTable } from "react-table";
 import type { Column } from "react-table";
 
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+
 type Data<T> = PrimitiveAtom<T>;
 type Prop<T> = {
   atoms: PrimitiveAtom<T>[];
@@ -30,16 +32,48 @@ export function List<T>({
 
   return (
     <VStack {...getTableBodyProps()}>
-      {rows.map((row) => {
-        prepareRow(row);
-        return (
-          <HStack {...row.getRowProps()}>
-            {row.cells.map((cell) => {
-              return <Box {...cell.getCellProps()}>{cell.render("Cell")}</Box>;
-            })}
-          </HStack>
-        );
-      })}
+      <DragDropContext onDragEnd={() => {}}>
+        <Droppable droppableId="droppable">
+          {(provided, snapshot) => (
+            <Box
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              //style={getListStyle(snapshot.isDraggingOver)}
+            >
+              {rows.map((row, index) => {
+                prepareRow(row);
+                const key = row.original.toString();
+                return (
+                  <Draggable key={key} draggableId={key} index={index}>
+                    {(provided, snapshot) => (
+                      <Box
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        // style={getItemStyle(
+                        //   snapshot.isDragging,
+                        //   provided.draggableProps.style
+                        // )}
+                      >
+                        <HStack {...row.getRowProps()}>
+                          {row.cells.map((cell) => {
+                            return (
+                              <Box {...cell.getCellProps()}>
+                                {cell.render("Cell")}
+                              </Box>
+                            );
+                          })}
+                        </HStack>
+                      </Box>
+                    )}
+                  </Draggable>
+                );
+              })}
+              {provided.placeholder}
+            </Box>
+          )}
+        </Droppable>
+      </DragDropContext>
     </VStack>
   );
 }
