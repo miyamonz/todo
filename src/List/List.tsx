@@ -1,6 +1,7 @@
 import React from "react";
 import type { PrimitiveAtom } from "jotai";
-import { Box, HStack, Table, Tbody, Tr, Td } from "@chakra-ui/react";
+import { Box, VStack, HStack } from "@chakra-ui/react";
+import { DragHandleIcon } from "@chakra-ui/icons";
 
 import { useTable } from "react-table";
 import type { Column } from "react-table";
@@ -15,32 +16,31 @@ export function List<T>({
   atoms,
   columns,
 }: Prop<T>): React.ReactElement<Prop<T>> {
-  const { getTableProps, getTableBodyProps, rows, prepareRow } = useTable({
-    columns,
+  const newColumns = React.useMemo(
+    () => [
+      { id: "handle", Cell: () => <DragHandleIcon aria-label="drag" /> },
+      ...columns,
+    ],
+    [columns.length]
+  );
+  const { getTableBodyProps, rows, prepareRow } = useTable({
+    columns: newColumns,
     data: atoms,
   });
 
   return (
-    <Table {...getTableProps()}>
-      <Tbody {...getTableBodyProps()}>
-        {rows.map((row) => {
-          prepareRow(row);
-          return (
-            <Tr {...row.getRowProps()}>
-              <Td p="2">
-                <HStack>
-                  {row.cells.map((cell) => {
-                    return (
-                      <Box {...cell.getCellProps()}>{cell.render("Cell")}</Box>
-                    );
-                  })}
-                </HStack>
-              </Td>
-            </Tr>
-          );
-        })}
-      </Tbody>
-    </Table>
+    <VStack {...getTableBodyProps()}>
+      {rows.map((row) => {
+        prepareRow(row);
+        return (
+          <HStack {...row.getRowProps()}>
+            {row.cells.map((cell) => {
+              return <Box {...cell.getCellProps()}>{cell.render("Cell")}</Box>;
+            })}
+          </HStack>
+        );
+      })}
+    </VStack>
   );
 }
 
