@@ -11,7 +11,7 @@ import { newTask } from "./Task";
 
 import { tasksAtom } from "./store";
 
-import { fromUnixTime, isToday } from "date-fns";
+import { fromUnixTime, isToday, isYesterday } from "date-fns";
 
 function useAddTask() {
   const setTasks = useUpdateAtom(tasksAtom);
@@ -26,11 +26,15 @@ function Home() {
     <Tabs isLazy>
       <TabList position="sticky" top={0} zIndex="sticky" background="white">
         <Tab>today</Tab>
+        <Tab>yesterday</Tab>
         <Tab>all</Tab>
       </TabList>
       <TabPanels>
         <TabPanel>
           <TaskListToday />
+        </TabPanel>
+        <TabPanel>
+          <TaskListPrev />
         </TabPanel>
         <TabPanel>
           <TaskListAll />
@@ -49,6 +53,16 @@ function TaskListToday() {
   const addTask = useAddTask();
 
   return <TaskList taskAtoms={filteredAtoms} remove={remove} add={addTask} />;
+}
+function TaskListPrev() {
+  const filter = React.useCallback(
+    (t) => isYesterday(fromUnixTime(t.created)),
+    []
+  );
+  const [filteredAtoms, remove] = useFilterAtom(tasksAtom, filter);
+  const addTask = useAddTask();
+
+  return <TaskList taskAtoms={filteredAtoms} remove={remove} />;
 }
 
 function TaskListAll() {

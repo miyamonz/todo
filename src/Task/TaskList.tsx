@@ -16,7 +16,7 @@ const identity = (a: unknown) => a;
 type Prop = {
   taskAtoms: PrimitiveAtom<Task>[];
   remove: (item: PrimitiveAtom<Task>) => void;
-  add: () => void;
+  add?: () => void;
 };
 
 const TaskList: React.FC<Prop> = ({ taskAtoms, remove, add }) => {
@@ -64,7 +64,7 @@ const TaskList: React.FC<Prop> = ({ taskAtoms, remove, add }) => {
   return (
     <Stack>
       <List atoms={taskAtoms} columns={columns} />
-      <Button onClick={() => add()}>add</Button>
+      {add && <Button onClick={() => add()}>add</Button>}
     </Stack>
   );
 };
