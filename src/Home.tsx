@@ -1,17 +1,10 @@
 import React from "react";
-import { useAtom } from "jotai";
 import { useUpdateAtom } from "jotai/utils";
-import { splitAtom } from "jotai/utils";
 
-import { useFilterAtom } from "./jotaiUtils/filterAtom";
-import { Tabs, TabList, Tab, TabPanels, TabPanel } from "@chakra-ui/react";
-
-import TaskList from "./Task/TaskList";
 import { newTask } from "./Task";
 
+import TaskListTabs from "./components/TaskListTabs";
 import { tasksAtom } from "./store";
-
-import { fromUnixTime, isToday, isYesterday } from "date-fns";
 
 function useAddTask() {
   const setTasks = useUpdateAtom(tasksAtom);
@@ -22,54 +15,8 @@ function useAddTask() {
 }
 
 function Home() {
-  return (
-    <Tabs isLazy>
-      <TabList position="sticky" top={0} zIndex="sticky" background="white">
-        <Tab>today</Tab>
-        <Tab>yesterday</Tab>
-        <Tab>all</Tab>
-      </TabList>
-      <TabPanels>
-        <TabPanel>
-          <TaskListToday />
-        </TabPanel>
-        <TabPanel>
-          <TaskListPrev />
-        </TabPanel>
-        <TabPanel>
-          <TaskListAll />
-        </TabPanel>
-      </TabPanels>
-    </Tabs>
-  );
-}
-
-function TaskListToday() {
-  const filterToday = React.useCallback(
-    (t) => isToday(fromUnixTime(t.created)),
-    []
-  );
-  const [filteredAtoms, remove] = useFilterAtom(tasksAtom, filterToday);
   const addTask = useAddTask();
-
-  return <TaskList taskAtoms={filteredAtoms} remove={remove} add={addTask} />;
-}
-function TaskListPrev() {
-  const filter = React.useCallback(
-    (t) => isYesterday(fromUnixTime(t.created)),
-    []
-  );
-  const [filteredAtoms, remove] = useFilterAtom(tasksAtom, filter);
-  const addTask = useAddTask();
-
-  return <TaskList taskAtoms={filteredAtoms} remove={remove} />;
-}
-
-function TaskListAll() {
-  const [atoms, remove] = useAtom(splitAtom(tasksAtom));
-  const addTask = useAddTask();
-
-  return <TaskList taskAtoms={atoms} remove={remove} add={addTask} />;
+  return <TaskListTabs tasksAtom={tasksAtom} addTask={addTask} />;
 }
 
 export default Home;

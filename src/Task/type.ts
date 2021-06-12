@@ -1,3 +1,4 @@
+import type { PrimitiveAtom } from "jotai";
 export interface Task {
   text: string;
   created: number; //unixtime
@@ -19,3 +20,4 @@ export function newTask(prop?: TaskProp): Task {
     ...prop,
   };
 }
+export type TaskAtom = PrimitiveAtom<Task>;
