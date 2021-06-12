@@ -3,13 +3,14 @@ import { useAtom } from "jotai";
 import { useUpdateAtom } from "jotai/utils";
 import { splitAtom } from "jotai/utils";
 
-import { useFilterAtom } from "./jotaiUtils/filterAtom";
+import { useFilterAtoms } from "./jotaiUtils/filterAtom";
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from "@chakra-ui/react";
 
 import ProjectList from "./Project/ProjectList";
 import { newProject } from "./Project/type";
 
 import { projectsAtom } from "./store";
+const projectAtomsAtom = splitAtom(projectsAtom);
 
 function Projects() {
   return (
@@ -39,8 +40,9 @@ function useAddProject() {
 }
 
 function ProjectListCurr() {
+  const [projectAtoms, remove] = useAtom(projectAtomsAtom);
   const filterToday = React.useCallback((t) => true, []);
-  const [filteredAtoms, remove] = useFilterAtom(projectsAtom, filterToday);
+  const filteredAtoms = useFilterAtoms(projectAtoms, filterToday);
 
   const add = useAddProject();
 

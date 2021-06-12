@@ -7,10 +7,11 @@ import Projects from "./Projects";
 import { Route } from "wouter";
 
 import { useUpdateAtom } from "jotai/utils";
-import { useFilterAtom } from "./jotaiUtils/filterAtom";
-import TaskList from "./Task/TaskList";
-import { tasksAtom } from "./store";
+import { useFilterAtoms } from "./jotaiUtils/filterAtom";
+import TaskListTabs from "./components/TaskListTabs";
+import { tasksAtom, useTaskAtoms } from "./store";
 import { newTask } from "./Task";
+import type { Task } from "./Task";
 
 function App() {
   return (
@@ -32,16 +33,17 @@ function useAddTask(id: string) {
   const setTasks = useUpdateAtom(tasksAtom);
   const addTask = React.useCallback(() => {
     setTasks((prev) => [...prev, newTask({ projectId: id })]);
-  }, []);
+  }, [id]);
   return addTask;
 }
 
 function TaskListByProject({ id }: { id: string }) {
-  const filterToday = React.useCallback((t) => t.projectId === id, []);
-  const [filteredAtoms, remove] = useFilterAtom(tasksAtom, filterToday);
+  const filterToday = React.useCallback((t: Task) => t.projectId === id, [id]);
+  const taskAtoms = useTaskAtoms();
+  const filteredAtoms = useFilterAtoms(taskAtoms, filterToday);
   const addTask = useAddTask(id);
 
-  return <TaskList taskAtoms={filteredAtoms} add={addTask} />;
+  return <TaskListTabs taskAtoms={filteredAtoms} addTask={addTask} />;
 }
 
 export default App;
