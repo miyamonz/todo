@@ -41,7 +41,7 @@ function TaskListByProject({ id }: { id: string }) {
   const [filteredAtoms, remove] = useFilterAtom(tasksAtom, filterToday);
   const addTask = useAddTask(id);
 
-  return <TaskList taskAtoms={filteredAtoms} remove={remove} add={addTask} />;
+  return <TaskList taskAtoms={filteredAtoms} add={addTask} />;
 }
 
 export default App;

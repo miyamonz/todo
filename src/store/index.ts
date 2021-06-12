@@ -1,4 +1,6 @@
+import { useCallback } from "react";
 import { atom } from "jotai";
+import { useUpdateAtom } from "jotai/utils";
 import { focusAtom } from "jotai/optics";
 
 import { State } from "./type";
@@ -9,6 +11,14 @@ export { jsonAtom };
 import { fromUnixTime, startOfDay } from "date-fns";
 
 export const tasksAtom = focusAtom(jsonAtom, (optic) => optic.prop("tasks"));
+
+export function useRemoveTask() {
+  const set = useUpdateAtom(tasksAtom);
+
+  return useCallback((id: string) => {
+    set((prev) => prev.filter((task) => task.id !== id));
+  }, []);
+}
 export const projectsAtom = focusAtom(jsonAtom, (optic) =>
   optic.prop("projects")
 );

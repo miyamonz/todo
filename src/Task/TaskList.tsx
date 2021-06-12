@@ -8,6 +8,7 @@ import { Stack, Button } from "@chakra-ui/react";
 
 import type { Column, CellProps } from "react-table";
 
+import { useRemoveTask } from "../store";
 import { ListTextarea } from "../components/ListTextarea";
 import type { Task } from "./type";
 
@@ -15,11 +16,10 @@ const identity = (a: unknown) => a;
 
 type Prop = {
   taskAtoms: PrimitiveAtom<Task>[];
-  remove: (item: PrimitiveAtom<Task>) => void;
   add?: () => void;
 };
 
-const TaskList: React.FC<Prop> = ({ taskAtoms, remove, add }) => {
+const TaskList: React.FC<Prop> = ({ taskAtoms, add }) => {
   type Data = PrimitiveAtom<Task>;
   type Value = PrimitiveAtom<Task>;
 
@@ -53,9 +53,11 @@ const TaskList: React.FC<Prop> = ({ taskAtoms, remove, add }) => {
       {
         id: "remove",
         accessor: identity,
-        Cell: ({ value }: CellProps<Data, Value>) => (
-          <Button onClick={() => remove(value)}>x</Button>
-        ),
+        Cell: ({ value }: CellProps<Data, Value>) => {
+          const [task] = useAtom(value);
+          const remove = useRemoveTask();
+          return <Button onClick={() => remove(task.id)}>x</Button>;
+        },
       },
     ],
     []

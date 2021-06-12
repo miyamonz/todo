@@ -55,11 +55,7 @@ function TaskListToday({
   const [filteredAtoms, remove] = useFilterAtom(tasksAtom, filterToday);
 
   return (
-    <TaskList
-      taskAtoms={filteredAtoms}
-      remove={remove}
-      add={() => addTask({ text: "" })}
-    />
+    <TaskList taskAtoms={filteredAtoms} add={() => addTask({ text: "" })} />
   );
 }
 function TaskListPrev({ tasksAtom }: { tasksAtom: TasksAtom }) {
@@ -69,13 +65,13 @@ function TaskListPrev({ tasksAtom }: { tasksAtom: TasksAtom }) {
   );
   const [filteredAtoms, remove] = useFilterAtom(tasksAtom, filter);
 
-  return <TaskList taskAtoms={filteredAtoms} remove={remove} />;
+  return <TaskList taskAtoms={filteredAtoms} />;
 }
 
 function TaskListAll({ tasksAtom }: { tasksAtom: TasksAtom }) {
   const [atoms, remove] = useAtom(splitAtom(tasksAtom));
 
-  return <TaskList taskAtoms={atoms} remove={remove} />;
+  return <TaskList taskAtoms={atoms} />;
 }
 
 export default TaskListTabs;
