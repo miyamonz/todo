@@ -6,17 +6,19 @@ import { DragHandleIcon } from "@chakra-ui/icons";
 import { useTable } from "react-table";
 import type { Column } from "react-table";
 
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { List as MovableList, arrayMove } from "react-movable";
 
 type Data<T> = PrimitiveAtom<T>;
 type Prop<T> = {
   atoms: PrimitiveAtom<T>[];
   columns: Column<Data<T>>[];
+  onChange: (from: PrimitiveAtom<T>, to: PrimitiveAtom<T>) => void;
 };
 
 export function List<T>({
   atoms,
   columns,
+  onChange,
 }: Prop<T>): React.ReactElement<Prop<T>> {
   const newColumns = React.useMemo(
     () => [
@@ -31,50 +33,30 @@ export function List<T>({
   });
 
   return (
-    <VStack {...getTableBodyProps()}>
-      <DragDropContext onDragEnd={() => {}}>
-        <Droppable droppableId="droppable">
-          {(provided, snapshot) => (
-            <Box
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              //style={getListStyle(snapshot.isDraggingOver)}
-            >
-              {rows.map((row, index) => {
-                prepareRow(row);
-                const key = row.original.toString();
-                return (
-                  <Draggable key={key} draggableId={key} index={index}>
-                    {(provided, snapshot) => (
-                      <Box
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        // style={getItemStyle(
-                        //   snapshot.isDragging,
-                        //   provided.draggableProps.style
-                        // )}
-                      >
-                        <HStack {...row.getRowProps()}>
-                          {row.cells.map((cell) => {
-                            return (
-                              <Box {...cell.getCellProps()}>
-                                {cell.render("Cell")}
-                              </Box>
-                            );
-                          })}
-                        </HStack>
-                      </Box>
-                    )}
-                  </Draggable>
-                );
-              })}
-              {provided.placeholder}
-            </Box>
-          )}
-        </Droppable>
-      </DragDropContext>
-    </VStack>
+    <MovableList
+      values={rows}
+      onChange={({ oldIndex, newIndex }) => {
+        const from = atoms[oldIndex];
+        const to = atoms[newIndex];
+        onChange(from, to);
+      }}
+      renderList={({ children, props }) => (
+        <VStack {...getTableBodyProps()} {...props}>
+          {children}
+        </VStack>
+      )}
+      renderItem={({ value, props }) => {
+        const row = value;
+        prepareRow(row);
+        return (
+          <HStack {...row.getRowProps()} {...props}>
+            {row.cells.map((cell) => {
+              return <Box {...cell.getCellProps()}>{cell.render("Cell")}</Box>;
+            })}
+          </HStack>
+        );
+      }}
+    />
   );
 }
 

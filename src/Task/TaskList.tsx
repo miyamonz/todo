@@ -12,6 +12,8 @@ import { useRemoveTask } from "../store";
 import { ListTextarea } from "../components/ListTextarea";
 import type { Task } from "./type";
 
+import { useMoveByTaskAtom } from "../store/tasks";
+
 const identity = (a: unknown) => a;
 
 type Prop = {
@@ -63,9 +65,14 @@ const TaskList: React.FC<Prop> = ({ taskAtoms, add }) => {
     []
   );
 
+  const move = useMoveByTaskAtom();
   return (
     <Stack>
-      <List atoms={taskAtoms} columns={columns} />
+      <List
+        atoms={taskAtoms}
+        columns={columns}
+        onChange={(from, to) => move([from, to])}
+      />
       {add && <Button onClick={() => add()}>add</Button>}
     </Stack>
   );
