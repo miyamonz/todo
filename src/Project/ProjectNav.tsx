@@ -1,7 +1,7 @@
 import React from "react";
 import { useAtom } from "jotai";
 
-import { Link } from "wouter";
+import { Link, useRoute } from "wouter";
 import { projectsAtom } from "../store";
 import { splitAtom } from "jotai/utils";
 
@@ -29,9 +29,13 @@ const ProjectList: React.FC<Prop> = ({}) => {
 
 function ProjectItem({ atom }: { atom: ProjectAtom }) {
   const [project] = useAtom(atom);
+  const [match, params] = useRoute("/projects/:id");
   return (
     <Link key={project.id} href={`/projects/${project.id}`}>
-      <Button w="100%" bg={"white.300"} color={"black.300"} fontSize={"xl"}>
+      <Button
+        colorScheme="orange"
+        variant={match && params?.id == project.id ? "solid" : ""}
+      >
         {project.title}
       </Button>
     </Link>
