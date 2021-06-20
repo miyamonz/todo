@@ -29,7 +29,7 @@ function TaskListTabs({
           <TaskListToday taskAtoms={taskAtoms} addTask={addTask} />
         </TabPanel>
         <TabPanel>
-          <TaskListPrev taskAtoms={taskAtoms} />
+          <TaskListYesterday taskAtoms={taskAtoms} />
         </TabPanel>
         <TabPanel>
           <TaskList taskAtoms={taskAtoms} />
@@ -56,7 +56,7 @@ function TaskListToday({
     <TaskList taskAtoms={filteredAtoms} add={() => addTask({ text: "" })} />
   );
 }
-function TaskListPrev({ taskAtoms }: { taskAtoms: TaskAtoms }) {
+function TaskListYesterday({ taskAtoms }: { taskAtoms: TaskAtoms }) {
   const filter = React.useCallback(
     (t: Task) => isYesterday(fromUnixTime(t.created)),
     []
